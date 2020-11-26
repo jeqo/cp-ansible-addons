@@ -1,0 +1,6 @@
+---
+- name: Prometheus Node Exporter
+  hosts: all
+  tasks:
+    - import_role: 
+        name: prometheus.node_exporter
