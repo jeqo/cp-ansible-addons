@@ -6,7 +6,7 @@ After=network.target
 User={{node_exporter_user}}
 Group={{node_exporter_group}}
 Type=simple
-ExecStart={{node_exporter_home}}/node_exporter
+ExecStart={{node_exporter_home}}/node_exporter-{{node_exporter_version}}.linux-amd64/node_exporter
 
 [Install]
 WantedBy=multi-user.target
