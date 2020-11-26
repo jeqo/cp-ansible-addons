@@ -23,6 +23,7 @@
     dest: "{{node_exporter_home}}"
     owner: "{{node_exporter_user}}"
     group: "{{node_exporter_group}}"
+    remote_src: "{{node_exporter_url_remote|bool}}"
 
 - name: Prepare service
   template:
