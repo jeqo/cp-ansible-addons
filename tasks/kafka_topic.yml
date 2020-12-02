@@ -9,4 +9,4 @@
   register: task
 
 - debug: var=task.stdout_lines
-- debug: var=task.stderr_lines
+  #- debug: var=task.stderr_lines

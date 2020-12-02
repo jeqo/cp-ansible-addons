@@ -1,0 +1,22 @@
+---
+- name: prepare config file
+  template:
+    src: client.properties.j2
+    dest: /tmp/producer.properties
+
+- name: set input file
+  copy:
+    src: producer-avro.test
+    dest: /tmp/producer-avro.test
+
+- name: set input schema
+  copy:
+    src: producer.avsc
+    dest: /tmp/producer.avsc
+
+- name: produce into kafka topic
+  shell: "{{confluent.bin_path}}kafka-avro-console-producer --bootstrap-server {{ kafka.bootstrap_servers }} --producer.config /tmp/producer.properties --property value.schema=\"$(< /tmp/producer.avsc)\" --property schema.registry.url={{producer.schema_registry_url}} --property basic.auth.credentials.source=USER_INFO --property schema.registry.basic.auth.user.info={{producer.schema_registry_credentials}}  --topic {{topic.name}} < /tmp/producer-avro.test"
+  register: task
+
+- debug: var=task.stdout_lines
+- debug: var=task.stderr_lines
