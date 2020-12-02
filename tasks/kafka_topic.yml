@@ -1,0 +1,12 @@
+---
+- name: prepare config file
+  template:
+    src: client.properties.j2
+    dest: /tmp/admin.properties
+
+- name: create kafka topic
+  shell: "{{confluent.bin_path}}kafka-topics --bootstrap-server {{ kafka.bootstrap_servers }} --command-config /tmp/admin.properties --create --topic {{topic.name}} --partitions {{topic.partitions}} --if-not-exists"
+  register: task
+
+- debug: var=task.stdout_lines
+- debug: var=task.stderr_lines

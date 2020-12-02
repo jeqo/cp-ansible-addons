@@ -1,0 +1,84 @@
+---
+- name: perf test
+  hosts: control_center
+  vars:
+    confluent:
+      bin_path: ''
+    kafka:
+      bootstrap_servers: ip-172-30-27-155.eu-west-1.compute.internal:9093,ip-172-30-46-189.eu-west-1.compute.internal:9093
+    topic:
+      name: single-test-v4
+      partitions: 10
+    admin:
+      properties:
+        security.protocol: SASL_SSL
+        sasl.mechanism: SCRAM-SHA-512
+        sasl.jaas.config: 'org.apache.kafka.common.security.scram.ScramLoginModule required username="admin" password="admin-secret";'
+        ssl.truststore.location: /var/ssl/private/control_center.truststore.jks
+        ssl.truststore.password: confluenttruststorepass
+    producer:
+      num_records: 300000
+      throughput: 1000
+      record_size: 100
+      properties:
+        security.protocol: SASL_SSL
+        sasl.mechanism: SCRAM-SHA-512
+        sasl.jaas.config: 'org.apache.kafka.common.security.scram.ScramLoginModule required username="admin" password="admin-secret";'
+        ssl.truststore.location: /var/ssl/private/control_center.truststore.jks
+        ssl.truststore.password: confluenttruststorepass
+        batch.size: 100
+      jvm_opts: -Xmx512M
+    consumer:
+      messages: 100000
+      threads: 3
+      num_fetch_threads: 1
+      properties:
+        security.protocol: SASL_SSL
+        sasl.mechanism: SCRAM-SHA-512
+        sasl.jaas.config: 'org.apache.kafka.common.security.scram.ScramLoginModule required username="admin" password="admin-secret";'
+        ssl.truststore.location: /var/ssl/private/control_center.truststore.jks
+        ssl.truststore.password: confluenttruststorepass
+        group.id: test-consumer-v1
+      jvm_opts: -Xmx512M
+  tasks:
+    - import_tasks: tasks/kafka_topic.yml
+      vars:
+        client_properties: "{{admin.properties}}"
+
+    - name: prepare config file
+      template:
+        src: client.properties.j2
+        dest: /tmp/producer.properties
+      vars:
+        client_properties: "{{producer.properties}}"
+    
+    - name: perf produce into kafka topic
+      shell: "KAFKA_HEAP_OPTS='{{producer.jvm_opts}}' {{confluent.bin_path}}kafka-producer-perf-test --producer-props bootstrap.servers={{ kafka.bootstrap_servers }} --producer.config /tmp/producer.properties --topic {{topic.name}} --num-records {{producer.num_records}} --throughput {{producer.throughput}} --record-size {{producer.record_size}} > /tmp/perf-producer.txt"
+      async: 300
+      poll: 0
+      register: produce
+    
+    - name: prepare config file
+      template:
+        src: client.properties.j2
+        dest: /tmp/consumer.properties
+      vars:
+        client_properties: "{{consumer.properties}}"
+    
+    - name: perf consume into kafka topic
+      shell: "KAFKA_HEAP_OPTS='{{consumer.jvm_opts}}' {{confluent.bin_path}}kafka-consumer-perf-test --bootstrap-server {{ kafka.bootstrap_servers }} --consumer.config /tmp/consumer.properties --topic {{topic.name}} --messages {{consumer.messages}} --num-fetch-threads {{consumer.num_fetch_threads}} --threads {{consumer.threads}} --from-latest"
+      # async: 5
+      # poll: 0
+      register: consume
+    
+    - debug: var=consume.stdout_lines
+    - debug: var=consume.stderr_lines
+  
+    - name: Check sync status
+      async_status:
+        jid: "{{produce.ansible_job_id}}"
+      register: job_result
+      until: job_result.finished
+      retries: 100
+      delay: 30
+    

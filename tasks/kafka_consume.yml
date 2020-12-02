@@ -1,0 +1,12 @@
+---
+- name: prepare config file
+  template:
+    src: client.properties.j2
+    dest: /tmp/consumer.properties
+
+- name: consume from kafka topic
+  shell: "{{confluent.bin_path}}kafka-console-consumer --bootstrap-server {{ kafka.bootstrap_servers }} --consumer.config /tmp/producer.properties --topic {{topic.name}} --from-beginning --max-messages 300 > /tmp/consumed-msg.test"
+  register: task
+
+- debug: var=task.stdout_lines
+- debug: var=task.stderr_lines
