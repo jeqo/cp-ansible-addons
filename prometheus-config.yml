@@ -1,0 +1,14 @@
+- hosts: localhost
+  gather_facts: no
+  vars:
+    env: dev
+    prom_node_exporter_port: 9100
+    prom_zookeeper_port: 8079
+    prom_kafka_port: 8080
+    prom_schema_registry_port: 8078
+    prom_connect_port: 8077
+    prom_ksqldb_port: 8076
+  tasks:
+    - template:
+        src: prometheus.yml.j2
+        dest: out/prometheus.yml

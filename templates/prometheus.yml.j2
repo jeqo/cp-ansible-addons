@@ -1,0 +1,54 @@
+scrape_configs:
+  - job_name: "node_exporter"
+    static_configs:
+      - targets:
+{% for host in groups['all'] %}
+          - "{{host}}:{{prom_node_exporter_port}}"
+{% endfor %}
+        labels:
+          env: "{{env}}"
+
+  - job_name: "zookeeper"
+    static_configs:
+      - targets:
+{% for host in groups['zookeeper'] %}
+          - "{{host}}:{{prom_zookeeper_port}}"
+{% endfor %}
+        labels:
+          env: "{{env}}"
+
+  - job_name: "kafka"
+    static_configs:
+      - targets:
+{% for host in groups['kafka_broker'] %}
+          - "{{host}}:{{prom_kafka_port}}"
+{% endfor %}
+        labels:
+          env: "{{env}}"
+
+  - job_name: "schemaregistry"
+    static_configs:
+      - targets:
+{% for host in groups['schema_registry'] %}
+          - "{{host}}:{{prom_schema_registry_port}}"
+{% endfor %}
+        labels:
+          env: "{{env}}"
+     
+  - job_name: "connect"
+    static_configs:
+      - targets:
+{% for host in groups['kafka_connect'] %}
+          - "{{host}}:{{prom_connect_port}}"
+{% endfor %}
+        labels:
+          env: "{{env}}"
+
+  - job_name: "ksqldb"
+    static_configs:
+      - targets:
+{% for host in groups['ksql'] %}
+          - "{{host}}:{{prom_ksqldb_port}}"
+{% endfor %}
+        labels:
+          env: "{{env}}"
