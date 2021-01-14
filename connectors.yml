@@ -48,3 +48,23 @@
       run_once: yes
       vars:
         quickstart: pageviews
+
+
+    - name: prepare connector config
+      template:
+        src: file-connector.json.j2
+        dest: /tmp/file-connector.json
+      delegate_to: localhost
+      run_once: yes
+    - name: run command
+      uri:
+        url: "{{connect_url}}/connectors"
+        method: POST
+        body: "{{ lookup('file', '/tmp/file-connector.json' )}}"
+        body_format: json
+        user: "{{principal_name}}"
+        password: "{{principal_password}}"
+        validate_certs: no
+        status_code: [201, 409]
+      run_once: yes
+      

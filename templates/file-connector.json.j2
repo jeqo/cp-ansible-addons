@@ -1,0 +1,11 @@
+{
+  "name": "file-pageviews",
+  "config": {
+    "connector.class": "org.apache.kafka.connect.file.FileStreamSinkConnector",
+    "tasks.max": "1",
+    "topics": "pageviews",
+    "file": "/tmp/pageviews.txt",
+    "principal.service.name": "{{principal_name}}",
+    "principal.service.password": "{{principal_password}}"
+  }
+}
