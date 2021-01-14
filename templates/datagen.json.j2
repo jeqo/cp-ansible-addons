@@ -1,0 +1,11 @@
+{
+  "name": "datagen-{{quickstart}}",
+  "config": {
+    "connector.class": "io.confluent.kafka.connect.datagen.DatagenConnector",
+    "tasks.max": "1",
+    "kafka.topic": "{{quickstart}}",
+    "quickstart": "{{quickstart}}",
+    "principal.service.name": "{{principal_name}}",
+    "principal.service.password": "{{principal_password}}"
+  }
+}

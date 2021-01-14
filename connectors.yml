@@ -1,0 +1,50 @@
+- hosts: kafka_connect
+  vars:
+    principal_name: connect
+    principal_password: password
+    connect_url: https://localhost:8083
+  tasks:
+    - name: prepare connector config
+      template:
+        src: datagen.json.j2
+        dest: /tmp/{{quickstart}}.json
+      delegate_to: localhost
+      run_once: yes
+      vars:
+        quickstart: users
+    - name: run command
+      uri:
+        url: "{{connect_url}}/connectors"
+        method: POST
+        body: "{{ lookup('file', '/tmp/{{quickstart}}.json' )}}"
+        body_format: json
+        user: "{{principal_name}}"
+        password: "{{principal_password}}"
+        validate_certs: no
+        status_code: [201, 409]
+      run_once: yes
+      vars:
+        quickstart: users
+
+
+    - name: prepare connector config
+      template:
+        src: datagen.json.j2
+        dest: /tmp/{{quickstart}}.json
+      delegate_to: localhost
+      run_once: yes
+      vars:
+        quickstart: pageviews
+    - name: run command
+      uri:
+        url: "{{connect_url}}/connectors"
+        method: POST
+        body: "{{ lookup('file', '/tmp/{{quickstart}}.json' )}}"
+        body_format: json
+        user: "{{principal_name}}"
+        password: "{{principal_password}}"
+        validate_certs: no
+        status_code: [201, 409]
+      run_once: yes
+      vars:
+        quickstart: pageviews
