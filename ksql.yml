@@ -1,17 +1,27 @@
-- hosts: localhost
+- hosts: ksql
+  gather_facts: no
   vars:
-    ksql:
-      url:
-      statement:
+    ksql_url: https://localhost:8088
+    ksql_user: ksql
+    ksql_password: password
+    ksql_statements:
+      - CREATE STREAM pageviews1 WITH (kafka_topic='pageviews', value_format='avro');
+      - CREATE STREAM users1 WITH (kafka_topic='users', value_format='avro');
+      - CREATE TABLE pageviews_sum_by_userid1 WITH(kafka_topic='pageviews_sum_by_userid') AS SELECT userid, sum(viewtime) AS SUM_VIEW_TIME FROM pageviews GROUP BY userid EMIT CHANGES;
+      - CREATE STREAM pageviews_with_users1 WITH(kafka_topic='pageviews_with_users') AS SELECT * FROM pageviews LEFT JOIN users WITHIN 10 MINUTES ON pageviews.userid = users.userid;
   tasks:
-    - template:
-        src: ksql.json.j2
-        dest: /tmp/ksql.json
-
-    - uri:
-        url: "{{ ksql.url }}"
-        user: "{{ksql.user}}"
-        password: "{{ksql.password}}"
-        method: POST
-        body: "{{lookup('file', '/tmp/ksql.json')}}"
-        body_format: json
+    - block:
+        - template:
+            src: ksql.json.j2
+            dest: /tmp/ksql.json
+          delegate_to: localhost
+    
+        - uri:
+            url: "{{ksql_url}}/ksql"
+            user: "{{ksql_user}}"
+            password: "{{ksql_password}}"
+            method: POST
+            body: "{{lookup('file', '/tmp/ksql.json')}}"
+            body_format: json
+            validate_certs: no
+      run_once: true

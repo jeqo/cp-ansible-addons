@@ -5,10 +5,10 @@
     confluent:
       bin_path: ''
     kafka:
-      bootstrap_servers: ip-172-30-27-155.eu-west-1.compute.internal:9093,ip-172-30-46-189.eu-west-1.compute.internal:9093
+      bootstrap_servers: ip-172-30-18-38.eu-west-1.compute.internal:9093
     topic:
-      name: single-test-v4
-      partitions: 10
+      name: single-test-v1
+      partitions: 32
     admin:
       properties:
         security.protocol: SASL_SSL
@@ -17,9 +17,9 @@
         ssl.truststore.location: /var/ssl/private/control_center.truststore.jks
         ssl.truststore.password: confluenttruststorepass
     producer:
-      num_records: 300000
-      throughput: 1000
-      record_size: 100
+      num_records: 1000000
+      throughput: 10000
+      record_size: 1000
       properties:
         security.protocol: SASL_SSL
         sasl.mechanism: SCRAM-SHA-512
@@ -27,9 +27,10 @@
         ssl.truststore.location: /var/ssl/private/control_center.truststore.jks
         ssl.truststore.password: confluenttruststorepass
         batch.size: 100
+        linger.ms: 5
       jvm_opts: -Xmx512M
     consumer:
-      messages: 100000
+      messages: 500000
       threads: 3
       num_fetch_threads: 1
       properties:
@@ -54,7 +55,7 @@
     
     - name: perf produce into kafka topic
       shell: "KAFKA_HEAP_OPTS='{{producer.jvm_opts}}' {{confluent.bin_path}}kafka-producer-perf-test --producer-props bootstrap.servers={{ kafka.bootstrap_servers }} --producer.config /tmp/producer.properties --topic {{topic.name}} --num-records {{producer.num_records}} --throughput {{producer.throughput}} --record-size {{producer.record_size}} > /tmp/perf-producer.txt"
-      async: 300
+      async: 600
       poll: 0
       register: produce
     

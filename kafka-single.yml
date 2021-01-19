@@ -5,10 +5,11 @@
     confluent:
       bin_path: ''
     kafka:
-      bootstrap_servers: ip-172-30-27-155.eu-west-1.compute.internal:9093
+      bootstrap_servers: ip-172-30-18-38.eu-west-1.compute.internal:9093
     topic:
-      name: single-test-v3
+      name: single-test-v1
       partitions: 3
+
     admin:
       properties:
         security.protocol: SASL_SSL
