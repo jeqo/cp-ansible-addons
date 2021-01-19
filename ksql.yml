@@ -1,0 +1,17 @@
+- hosts: localhost
+  vars:
+    ksql:
+      url:
+      statement:
+  tasks:
+    - template:
+        src: ksql.json.j2
+        dest: /tmp/ksql.json
+
+    - uri:
+        url: "{{ ksql.url }}"
+        user: "{{ksql.user}}"
+        password: "{{ksql.password}}"
+        method: POST
+        body: "{{lookup('file', '/tmp/ksql.json')}}"
+        body_format: json
