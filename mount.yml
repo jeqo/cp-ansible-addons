@@ -1,0 +1,48 @@
+- hosts: zookeeper
+  tasks:
+    - shell: mkfs -t xfs /dev/nvme1n1
+      ignore_errors: true
+    - shell: mkdir /var/lib/zookeeper
+      ignore_errors: true
+    - mount:
+        path: /var/lib/zookeeper
+        src: /dev/nvme1n1
+        fstype: xfs
+        opts: defaults,nofail
+        state: mounted
+- hosts: kafka_broker
+  tasks:
+    - shell: mkfs -t xfs /dev/nvme1n1
+      ignore_errors: true
+    - shell: mkdir /var/lib/kafka
+      ignore_errors: true
+    - mount:
+        path: /var/lib/kafka
+        src: /dev/nvme1n1
+        fstype: xfs
+        opts: defaults,noatime
+        state: mounted
+- hosts: ksql
+  tasks:
+    - shell: mkfs -t xfs /dev/nvme1n1
+      ignore_errors: true
+    - shell: mkdir /var/lib/kafka
+      ignore_errors: true
+    - mount:
+        path: /var/lib/kafka
+        src: /dev/nvme1n1
+        fstype: xfs
+        opts: defaults,noatime
+        state: mounted
+- hosts: control_center
+  tasks:
+    - shell: mkfs -t xfs /dev/nvme1n1
+      ignore_errors: true
+    - shell: mkdir /var/lib/confluent
+      ignore_errors: true
+    - mount:
+        path: /var/lib/confluent
+        src: /dev/nvme1n1
+        fstype: xfs
+        opts: defaults,noatime
+        state: mounted

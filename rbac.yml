@@ -1,0 +1,92 @@
+- hosts: kafka_broker
+  gather_facts: no
+  vars:
+    rbac_user: mds
+    rbac_password: password
+    rbac_principal: Group:ops
+    rbac_role: SystemAdmin
+    kafka_cluster_id: ""
+  tasks:
+    - block:
+        - uri:    
+            url: "https://localhost:8090/security/1.0/principals/{{rbac_principal}}/roles/{{rbac_role}}"
+            method: POST
+            validate_certs: false
+            force_basic_auth: true
+            url_username: "{{rbac_user}}"
+            url_password: "{{rbac_password}}"
+            headers:
+              Content-Type: application/json
+            body_format: json
+            body: >
+              {
+                "clusters": {
+                  "kafka-cluster": "{{kafka_cluster_id}}"
+                }
+              }
+            status_code: 204
+      tags: kafka_cluster
+      run_once: yes
+    - block:
+        - uri:    
+            url: "https://localhost:8090/security/1.0/principals/{{rbac_principal}}/roles/{{rbac_role}}"
+            method: POST
+            validate_certs: false
+            force_basic_auth: true
+            url_username: "{{rbac_user}}"
+            url_password: "{{rbac_password}}"
+            headers:
+              Content-Type: application/json
+            body_format: json
+            body: >
+              {
+                "clusters": {
+                  "kafka-cluster": "{{kafka_cluster_id}}",
+                  "schema-registry-cluster": "schema-registry"
+                }
+              }
+            status_code: 204
+      tags: schema_registry
+      run_once: yes
+    - block:
+        - uri:    
+            url: "https://localhost:8090/security/1.0/principals/{{rbac_principal}}/roles/{{rbac_role}}"
+            method: POST
+            validate_certs: false
+            force_basic_auth: true
+            url_username: "{{rbac_user}}"
+            url_password: "{{rbac_password}}"
+            headers:
+              Content-Type: application/json
+            body_format: json
+            body: >
+              {
+                "clusters": {
+                  "kafka-cluster": "{{kafka_cluster_id}}",
+                  "connect-cluster": "connect-cluster"
+                }
+              }
+            status_code: 204
+      tags: kafka_connect
+      run_once: yes
+    - block:
+        - uri:    
+            url: "https://localhost:8090/security/1.0/principals/{{rbac_principal}}/roles/{{rbac_role}}"
+            method: POST
+            validate_certs: false
+            force_basic_auth: true
+            url_username: "{{rbac_user}}"
+            url_password: "{{rbac_password}}"
+            headers:
+              Content-Type: application/json
+            body_format: json
+            body: >
+              {
+                "clusters": {
+                  "kafka-cluster": "{{kafka_cluster_id}}",
+                  "ksql-cluster": "default_"
+                }
+              }
+            status_code: 204
+      tags: ksql
+      run_once: yes
