@@ -6,6 +6,9 @@
     rbac_principal: Group:ops
     rbac_role: SystemAdmin
     kafka_cluster_id: ""
+    schema_registry_cluster_id: "schema-registry"
+    kafka_connect_cluster_id: "connect-cluster"
+    ksql_cluster_id: "default_"
   tasks:
     - block:
         - uri:    
@@ -42,7 +45,7 @@
               {
                 "clusters": {
                   "kafka-cluster": "{{kafka_cluster_id}}",
-                  "schema-registry-cluster": "schema-registry"
+                  "schema-registry-cluster": "{{schema_registry_cluster_id}}"
                 }
               }
             status_code: 204
@@ -63,7 +66,7 @@
               {
                 "clusters": {
                   "kafka-cluster": "{{kafka_cluster_id}}",
-                  "connect-cluster": "connect-cluster"
+                  "connect-cluster": "{{kafka_connect_cluster_id}}"
                 }
               }
             status_code: 204
@@ -84,7 +87,7 @@
               {
                 "clusters": {
                   "kafka-cluster": "{{kafka_cluster_id}}",
-                  "ksql-cluster": "default_"
+                  "ksql-cluster": "{{ksql_cluster_id}}"
                 }
               }
             status_code: 204
