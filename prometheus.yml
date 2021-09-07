@@ -1,0 +1,6 @@
+---
+- name: Prometheus Server
+  hosts: prometheus
+  tasks:
+    - import_role: 
+        name: prometheus.server

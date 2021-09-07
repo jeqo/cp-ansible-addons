@@ -3,7 +3,7 @@ scrape_configs:
     static_configs:
       - targets:
 {% for host in groups['all'] %}
-          - "{{host}}:{{prom_node_exporter_port}}"
+          - "{{host}}:{{prometheus_node_exporter_port}}"
 {% endfor %}
         labels:
           env: "{{env}}"
@@ -12,7 +12,7 @@ scrape_configs:
     static_configs:
       - targets:
 {% for host in groups['zookeeper'] %}
-          - "{{host}}:{{prom_zookeeper_port}}"
+          - "{{host}}:{{zookeeper_jmxexporter_port}}"
 {% endfor %}
         labels:
           env: "{{env}}"
@@ -21,7 +21,7 @@ scrape_configs:
     static_configs:
       - targets:
 {% for host in groups['kafka_broker'] %}
-          - "{{host}}:{{prom_kafka_port}}"
+          - "{{host}}:{{kafka_jmxexporter_port}}"
 {% endfor %}
         labels:
           env: "{{env}}"
@@ -30,7 +30,7 @@ scrape_configs:
     static_configs:
       - targets:
 {% for host in groups['schema_registry'] %}
-          - "{{host}}:{{prom_schema_registry_port}}"
+          - "{{host}}:{{schema_registry_jmxexporter_port}}"
 {% endfor %}
         labels:
           env: "{{env}}"
@@ -39,7 +39,7 @@ scrape_configs:
     static_configs:
       - targets:
 {% for host in groups['kafka_connect'] %}
-          - "{{host}}:{{prom_connect_port}}"
+          - "{{host}}:{{connect_jmxexporter_port}}"
 {% endfor %}
         labels:
           env: "{{env}}"
@@ -48,7 +48,7 @@ scrape_configs:
     static_configs:
       - targets:
 {% for host in groups['ksql'] %}
-          - "{{host}}:{{prom_ksqldb_port}}"
+          - "{{host}}:{{ksqldb_jmxexporter_port}}"
 {% endfor %}
         labels:
           env: "{{env}}"

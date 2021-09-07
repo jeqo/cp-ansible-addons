@@ -1,0 +1,31 @@
+- hosts: control_center
+  gather_facts: no
+  vars:
+    kafka_bootstrap_servers: localhost:9092
+    admin:
+      properties:
+        security.protocol: SASL_SSL
+        sasl.mechanism: SCRAM-SHA-512
+        sasl.jaas.config: 'org.apache.kafka.common.security.scram.ScramLoginModule required username="admin" password="admin-secret";'
+        ssl.truststore.location: /var/ssl/private/control_center.truststore.jks
+        ssl.truststore.password: confluenttruststorepass
+    rbac_user: mds
+    rbac_password: password
+    rbac_principal: Group:ops
+    rbac_role: SystemAdmin
+    kafka_cluster_id: ""
+    schema_registry_principal: "User:schema_registry"
+    schema_registry_topic: _schemas
+    schema_registry_group_id: schema-registry
+    kafka_connect_cluster_id: "connect-cluster"
+    ksql_cluster_id: "default_"
+  tasks:
+    - name: prepare config file
+      template:
+        src: client.properties.j2
+        dest: /tmp/admin.properties
+    - name: schema registry producer/consumer acl
+      shell: |
+        kafka-acls --bootstrap-server {{ kafka_bootstrap_servers }} --command-config /tmp/admin.properties \
+          --add --allow-principal '{{ schema_registry_principal }}' \
+          --producer --consumer --topic {{ schema_registry_topic }} --group {{ schema_registry_group_id }}
